@@ -20,29 +20,26 @@ vector<Graph> readGraphs(const string& filename) {
 
     for (int g = 0; g < numGraphs; ++g) {
         int numVertices, numEdges;
-        if (!(inputFile >> numVertices >> numEdges) || numVertices <= 0 || numEdges < 0) {
-            throw runtime_error("Invalid vertex or edge count!");
-        }
-        Graph graph(numVertices-1); //create an empty graph with numVertices vertices
+        inputFile >> numVertices >> numEdges;  // Read number of vertices and edges
+
+        Graph graph(numVertices);  // Create an empty graph with numVertices vertices
+
         for (int e = 0; e < numEdges; ++e) {
             int u, v, w;
-            if (!(inputFile >> u >> v >> w)) throw runtime_error("Error reading edge data!");
+            inputFile >> u >> v >> w;  // Read the edge data
 
-            if (u < 0 || v < 0 || u >= numVertices || v >= numVertices || w < 0) {
-                throw runtime_error("Invalid edge data: vertices or weights out of bounds!");
-            }
-
-            graph[u].emplace_back(v, w);
+            // Add the edge to the adjacency list (directed)
+            graph[u].emplace_back(v, w);  // Add directed edge from u to v with weight w
         }
+
         graphs.push_back(graph);  // Store the created graph in the list
     }
 
-    inputFile.close();
-    return graphs;
+    inputFile.close();  // Close the input file
+    return graphs;  // Return the list of graph
 }
 
 pair<int, vector<pair<int, int>>> prim(const Graph& graph) {
-
     int n = graph.size();
     vector<bool> inMST(n, false);  // Track vertices in MST
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
@@ -58,6 +55,7 @@ pair<int, vector<pair<int, int>>> prim(const Graph& graph) {
 
         int weight = current.first;
         int vertex = current.second;
+        std::cout << "Processing vertex " << vertex << " with weight " << weight << std::endl;
 
         if (inMST[vertex]) continue;
 
@@ -117,6 +115,7 @@ void processFile(const char* inputFile, const char* outputFile) {
             cerr << "No graphs found in input." << endl;
             return;
         }
+        displayGraph(graphs[0]);
 
         for (int i = 0; i < graphs.size(); ++i) {
             auto mstResult = prim(graphs[i]);
